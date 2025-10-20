@@ -173,7 +173,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("🛍️ Trent/Zudio FAQ Chatbot (PDF-only)")
+st.title("Trent/Zudio FAQ Chatbot Application")
 st.caption("Answers strictly from 'FAQs_questions.pdf'. Uses the same OpenRouter API as the original app.")
 
 TOP_FAQ_QUESTIONS = [
@@ -286,5 +286,6 @@ st.markdown(
 """,
     unsafe_allow_html=True,
 )
+
 
 
