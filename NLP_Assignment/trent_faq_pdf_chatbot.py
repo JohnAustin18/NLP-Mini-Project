@@ -27,8 +27,8 @@ except ImportError as e:
 OPENROUTER_API_KEY = "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"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL_NAME = "openai/gpt-3.5-turbo"
-# Use relative path to ensure it works when deployed
-FAQ_PDF_PATH = "FAQs_questions.pdf"
+# Use absolute path resolution to ensure it works when deployed
+FAQ_PDF_PATH = os.path.join(os.path.dirname(__file__), "FAQs_questions.pdf")
 MAX_SNIPPETS = 5
 MAX_SNIPPET_CHARS = 1000
 
@@ -71,6 +71,14 @@ def _read_faq_pdf(pdf_path: str) -> list:
     """Return list of dicts [{'page_number': int, 'text': str, 'source': 'faq_pdf'}] from the PDF only."""
     pages: list[dict] = []
     try:
+        # Check if file exists first
+        if not os.path.exists(pdf_path):
+            st.error(f"FAQ PDF not found at '{pdf_path}'")
+            st.error(f"Current working directory: {os.getcwd()}")
+            st.error(f"Files in current directory: {os.listdir('.')}")
+            st.error("Please ensure 'FAQs_questions.pdf' is in the same directory as the app.")
+            return pages
+            
         reader = PdfReader(pdf_path)
         for i, page in enumerate(reader.pages, start=1):
             try:
@@ -78,10 +86,11 @@ def _read_faq_pdf(pdf_path: str) -> list:
             except Exception:
                 text = ""
             pages.append({"page_number": i, "text": text.strip(), "source": "faq_pdf"})
-    except FileNotFoundError:
-        st.error(f"FAQ PDF not found at '{pdf_path}'. Place the file alongside the app.")
+        st.success(f"Successfully loaded FAQ PDF with {len(pages)} pages")
     except Exception as e:
         st.error(f"FAQ PDF couldn't be processed ({e}). The bot will not work properly.")
+        st.error(f"File path attempted: {pdf_path}")
+        st.error(f"File exists: {os.path.exists(pdf_path) if pdf_path else 'N/A'}")
     return pages
 
 @st.cache_resource
